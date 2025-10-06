@@ -1,0 +1,371 @@
+    Student GPSS/H Release 3.70 (CT256)     13 May 2025   10:43:49     File: kurs.txt
+
+    Line# Stmt#  If Do  Block#  *Loc	Operation	A,B,C,D,E,F,G	Comments  
+ 
+        1     1                 	SIMULATE
+        2     2                 	REALLOCATE COM,32720 	* выделение памяти для работы модели
+        3     3                  
+        4     4                  1 FUNCTION RN1,D3  		* время обработки на ARMi
+        5     5                  .1,16/.8,25/1,30	
+        6     6                  
+        7     7                  2 FUNCTION P1,E3  		* обработка на KMM
+        8     8                  1,2/2,3/3,FN3
+        9     9                  
+       10    10                  3 FUNCTION RN1,D2  		* время обработки tk3
+       11    11                  .2,3/1,1
+       12    12                  
+       13    13                  4 FUNCTION P1,E3		* переходы с КММ на RTERi
+       14    14                  1,RTER1/2,RTER2/3,RTER3
+       15    15                 	
+       16    16              1  	GENERATE 120,5,,57,10
+       17    17              2  	ASSING 1,1           	* P1 = 1 (идентификатор терминала 1)
+       18    18                  
+       19    19              3  RTER1	TEST E P2,1,TERM1   	* проверка обработалась ли заявка на ЦВК
+       20    20              4  	SAVEVALUE RET1+,1 	* сколько заявок вернулось с ЦВК
+       21    21              5  	SAVEVALUE CNTRET1+,1	* счетчик для определения завершения (каждая 5-ая)
+       22    22              6  	TEST E X$CNTRET1,5,TERM1
+       23    23              7  	SAVEVALUE CNTRET1,0	* сброс счетчика 
+       24    24              8  	ASSING 3,1		* параметр для идентификации заявки, которую надо удалить
+       25    25                  
+       26    26              9  TERM1   QUEUE QTERM1
+       27    27             10  	SEIZE TERM1
+       28    28             11  	DEPART QTERM1
+       29    29             12  	PRIORITY 10		* выравнивание приоритета заявки перед поступлением на АРМ
+       30    30             13  	ADVANCE 30,10
+       31    31             14  	RELEASE TERM1
+       32    32             15  	SAVEVALUE OBRT1+,1	* счетчик обработанных на терминале 1 заявок
+       33    33             16  	ASSIGN 2,0		* обнуляется 2-ой параметр
+       34    34             17  	TRANSFER ,ARM1
+       35    35                  
+       36    36             18  ARM1    QUEUE QARM1
+       37    37             19  	SEIZE ARM1
+       38    38             20  	DEPART QARM1
+       39    39             21  	ADVANCE FN1 
+       40    40             22  	RELEASE ARM1
+       41    41             23  	TEST E P3,1,MET2
+       42    42             24  	SAVEVALUE TRMNT1+,1	* счетчик завершенных заявок
+       43    43             25  	TRANSFER ,TRMN		* переход к завершению
+       44    44             26  MET2	TRANSFER .7,MET,RTER1	* с вероятностью 70% на терминал, иначе на KMM
+       45    45                  
+       46    46                  
+       47    47             27  	GENERATE 200,,,18,10
+       48    48             28  	ASSING 1,2           	* P1 = 2 (идентификатор терминала 2)
+       49    49                  
+       50    50             29  RTER2	TEST E P2,1,TERM2	* проверка обработалась ли заявка на ЦВК
+       51    51             30  	SAVEVALUE RET2+,1	* сколько заявок вернулось с ЦВК
+       52    52             31  	SAVEVALUE CNTRET2+,1	* счетчик для определения завершения (каждая 4-ая)
+       53    53             32  	TEST E X$CNTRET2,4,TERM2
+       54    54             33  	SAVEVALUE CNTRET2,0	* сброс счетчика
+       55    55             34  	ASSING 3,1
+       56    56                  
+
+    Student GPSS/H Release 3.70 (CT256)     13 May 2025   10:43:49     File: kurs.txt
+
+    Line# Stmt#  If Do  Block#  *Loc	Operation	A,B,C,D,E,F,G	Comments  
+ 
+       57    57             35  TERM2   QUEUE QTERM2
+       58    58             36  	SEIZE TERM2
+       59    59             37  	DEPART QTERM2
+       60    60             38  	PRIORITY 10	 	* выравнивание приоритета заявки перед поступлением на АРМ
+       61    61             39  	ADVANCE 33,5
+       62    62             40  	RELEASE TERM2
+       63    63             41  	SAVEVALUE OBRT2+,1	* счетчик обработанных на терминале 2 заявок
+       64    64             42  	ASSIGN 2,0	 	* обнуляется 2-ой параметр
+       65    65             43  	TRANSFER ,ARM2
+       66    66                  
+       67    67             44  ARM2    QUEUE QARM2
+       68    68             45  	SEIZE ARM2
+       69    69             46  	DEPART QARM2
+       70    70             47  	ADVANCE FN1 
+       71    71             48  	RELEASE ARM2
+       72    72             49  	TEST E P3,1,MET3
+       73    73             50  	SAVEVALUE TRMNT2+,1	* счетчик завершенных заявок
+       74    74             51  	TRANSFER ,TRMN		* переход к завершению
+       75    75             52  MET3	TRANSFER .7,MET,RTER2	* с вероятностью 70% на терминал, иначе на KMM
+       76    76                  
+       77    77                  
+       78    78             53  	GENERATE 90,15,,45,10
+       79    79             54  	ASSING 1,3           	* P1 = 3 (идентификатор терминала 3)
+       80    80                  
+       81    81             55  RTER3	TEST E P2,1,TERM3	* проверка обработалась ли заявка на ЦВК
+       82    82             56  	SAVEVALUE RET3+,1	* сколько заявок вернулось с ЦВК
+       83    83             57  	SAVEVALUE CNTRET3+,1	* счетчик для определения завершения (каждая 3-ая)
+       84    84             58  	TEST E X$CNTRET3,3,TERM3
+       85    85             59  	SAVEVALUE CNTRET3,0	* сброс счетчика
+       86    86             60  	ASSING 3,1
+       87    87                  
+       88    88             61  TERM3   QUEUE QTERM3
+       89    89             62  	SEIZE TERM3
+       90    90             63  	DEPART QTERM3
+       91    91             64  	PRIORITY 10		* выравнивание приоритета заявки перед поступлением на АРМ
+       92    92             65  	ADVANCE 35,12
+       93    93             66  	RELEASE TERM3
+       94    94             67  	SAVEVALUE OBRT3+,1	* счетчик обработанных на терминале 3 заявок
+       95    95             68  	ASSIGN 2,0		* обнуляется 2-ой параметр
+       96    96             69  	TRANSFER ,ARM3
+       97    97                  
+       98    98             70  ARM3    QUEUE QARM3
+       99    99             71  	SEIZE ARM3
+      100   100             72  	DEPART QARM3
+      101   101             73  	ADVANCE FN1 
+      102   102             74  	RELEASE ARM3
+      103   103             75  	TEST E P3,1,MET4
+      104   104             76  	SAVEVALUE TRMNT3+,1	* счетчик завершенных заявок
+      105   105             77  	TRANSFER ,TRMN		* переход к завершению
+      106   106             78  MET4	TRANSFER .7,MET,RTER3	* с вероятностью 70% на терминал, иначе на KMM
+      107   107                  
+      108   108             79  MET	LINK LKMM,FIFO,KMM	* "очередь" к КММ (FIFO, ARM PRIOR = 10, CVK PRIOR = 5)
+      109   109                  
+      110   110             80  KMM	QUEUE QKMM
+      111   111             81  	SEIZE KMM
+      112   112             82  	DEPART QKMM
+
+    Student GPSS/H Release 3.70 (CT256)     13 May 2025   10:43:49     File: kurs.txt
+
+    Line# Stmt#  If Do  Block#  *Loc	Operation	A,B,C,D,E,F,G	Comments  
+ 
+      113   113             83  	ADVANCE FN2 
+      114   114             84  	RELEASE KMM
+      115   115             85  	UNLINK LKMM,KMM,1	* выход из "очереди" менее приоритетной заявки
+      116   116             86  	TEST E P2,0,BACK	* если P2=0 - в CVK, иначе на терминал
+      117   117             87  	TRANSFER ,CVK
+      118   118             88  BACK	TRANSFER ,FN4 
+      119   119                  
+      120   120             89  CVK	QUEUE QCVK
+      121   121             90  	SEIZE CVK
+      122   122             91  	DEPART QCVK
+      123   123             92  	PRIORITY 5		* приоритет для заявок на КММ
+      124   124             93  	ADVANCE 40,5
+      125   125             94  	ASSIGN 2,1		* P2=1 - значит, что заявка обработалась на ЦВК
+      126   126             95  	RELEASE CVK
+      127   127             96  	SAVEVALUE OBRCVK+,1	* счетчик обработанных заявок в CVK
+      128   128             97  	TEST L X$OBRCVK,300,END		* если достигли 300 - конец симуляции
+      129   129             98  	TRANSFER ,MET
+      130   130                  
+      131   131             99  TRMN	TERMINATE
+      132   132                  
+      133   133            100  END     TERMINATE 1
+      134   134                 	START 1
+      135   135                 	END
+
+Entity Dictionary (in ascending order by entity number; "*" => value conflict.)
+
+       Facilities: 9=TERM1         18=ARM1         35=TERM2        44=ARM2         61=TERM3        70=ARM3         
+                   80=KMM          89=CVK
+
+           Queues: 1=QTERM1        2=QARM1         3=QTERM2        4=QARM2         5=QTERM3        6=QARM3         
+                   7=QKMM          8=QCVK
+
+        Functions: 1               2               3               4
+
+ Fullword Savexes: 1=RET1          2=CNTRET1       3=OBRT1         4=TRMNT1        5=RET2          6=CNTRET2       
+                   7=OBRT2         8=TRMNT2        9=RET3          10=CNTRET3      11=OBRT3        12=TRMNT3       
+                   13=OBRCVK
+
+      User Chains: 1=LKMM
+
+       Parameters: 1               2               3
+
+   Random Numbers: 1
+
+Symbol   Value   EQU Defns  Context      References by Statement Number
+ 
+RTER1        3              Absolute        14
+RTER2       29              Absolute        14
+RTER3       55              Absolute        14
+ 
+ARM1        18          36  Block           34
+ARM2        44          67  Block           65
+ARM3        70          98  Block           96
+BACK        88         118  Block          116
+CVK         89         120  Block          117
+END        100         133  Block          128
+KMM         80         110  Block          108   115
+MET         79         108  Block           44    75   106   129
+MET2        26          44  Block           41
+MET3        52          75  Block           72
+MET4        78         106  Block          103
+RTER1        3          19  Block           44
+RTER2       29          50  Block           75
+RTER3       55          81  Block          106
+TERM1        9          26  Block           19    22
+TERM2       35          57  Block           50    53
+TERM3       61          88  Block           81    84
+TRMN        99         131  Block           43    74   105
+ 
+ARM1        18              Facility        37    40
+ARM2        44              Facility        68    71
+ARM3        70              Facility        99   102
+CVK         89              Facility       121   126
+KMM         80              Facility       111   114
+TERM1        9              Facility        27    31
+TERM2       35              Facility        58    62
+TERM3       61              Facility        89    93
+ 
+QARM1        2              Queue           36    38
+QARM2        4              Queue           67    69
+QARM3        6              Queue           98   100
+QCVK         8              Queue          120   122
+QKMM         7              Queue          110   112
+QTERM1       1              Queue           26    28
+QTERM2       3              Queue           57    59
+QTERM3       5              Queue           88    90
+ 
+1            1           4  Function        39    70   101
+2            2           7  Function       113
+3            3          10  Function         8
+4            4          13  Function       118
+ 
+CNTRET1      2              Fullword Svx    21    22    23
+CNTRET2      6              Fullword Svx    52    53    54
+CNTRET3     10              Fullword Svx    83    84    85
+OBRCVK      13              Fullword Svx   127   128
+OBRT1        3              Fullword Svx    32
+OBRT2        7              Fullword Svx    63
+OBRT3       11              Fullword Svx    94
+RET1         1              Fullword Svx    20
+RET2         5              Fullword Svx    51
+RET3         9              Fullword Svx    82
+TRMNT1       4              Fullword Svx    42
+TRMNT2       8              Fullword Svx    73
+
+Symbol   Value   EQU Defns  Context      References by Statement Number
+ 
+TRMNT3      12              Fullword Svx   104
+ 
+LKMM         1              User Chain     108   115
+ 
+1            1              Parameter        7    13    17    48    79
+2            2              Parameter       19    33    50    64    81    95   116   125
+3            3              Parameter       24    41    55    72    86   103
+ 
+1            1              Random Nmbr      4    10
+
+
+
+Storage Requirements (Bytes)
+
+Compiled Code:     2788
+Compiled Data:      200
+Miscellaneous:        0
+Entities:          5756
+Common:           32720
+-----------------------
+Total:            41464
+
+
+
+GPSS/H Model Size:
+
+Control Statements      7
+Blocks                100
+
+
+
+Simulation begins.
+
+Relative Clock: 13412.5237   Absolute Clock: 13412.5237
+
+
+
+Block Current     Total  Block Current     Total  Block Current     Total  Block Current     Total  Block Current     Total
+1                    57  11                  433  21          1       432  31                   72  41                  268 
+2                    57  12                  433  22                  431  32                   72  42                  268 
+RTER1               472  13          1       433  23                  431  33                   18  43                  268 
+4                   116  14                  432  24                   15  34                   18  ARM2                268 
+5                   116  15                  432  25                   15  TERM2               268  45                  268 
+6                   116  16                  432  MET2                416  36                  268  46                  268 
+7                    23  17                  432  27                   18  37                  268  47                  268 
+8                    23  ARM1                432  28                   18  38                  268  48                  268 
+TERM1      39       472  19                  432  RTER2               268  39                  268  49                  268 
+10                  433  20                  432  30                   72  40                  268  50                   18 
+
+
+
+Block Current     Total  Block Current     Total  Block Current     Total  Block Current     Total  Block Current     Total
+51                   18  TERM3       7       385  71                  377  81                  601  91                  300 
+MET3                250  62                  378  72                  377  82                  601  92                  300 
+53                   45  63                  378  73          1       377  83                  601  93                  300 
+54                   45  64                  378  74                  376  84                  601  94                  300 
+RTER3               385  65          1       378  75                  376  85                  601  95                  300 
+56                  111  66                  377  76                   34  86                  601  96                  300 
+57                  111  67                  377  77                   34  87                  302  97                  300 
+58                  111  68                  377  MET4                342  BACK                299  98                  299 
+59                   37  69                  377  MET                 601  CVK         2       302  TRMN                 67 
+60                   37  ARM3                377  KMM                 601  90                  300  END                   1 
+
+
+
+          --Avg-Util-During--                                                               
+Facility  Total  Avail  Unavl     Entries    Average   Current  Percent  Seizing  Preempting
+           Time   Time   Time               Time/Xact   Status   Avail     Xact      Xact   
+   TERM1  0.986                       433      30.538    AVAIL               61 
+    ARM1  0.810                       432      25.140    AVAIL               49 
+   TERM2  0.659                       268      32.968    AVAIL                  
+    ARM2  0.500                       268      25.004    AVAIL                  
+   TERM3  0.988                       378      35.055    AVAIL               72 
+    ARM3  0.701                       377      24.944    AVAIL               24 
+     KMM  0.090                       601       2.000    AVAIL                  
+     CVK  0.889                       300      39.766    AVAIL                  
+
+
+
+   Queue     Maximum      Average       Total        Zero     Percent      Average      $Average     Qtable     Current
+            Contents     Contents      Entries     Entries     Zeros      Time/Unit    Time/Unit     Number    Contents
+  QTERM1          49       32.826         472           5        1.1       932.785       942.772                     39
+   QARM1           1        0.055         432         295       68.3         1.701         5.363                      0
+  QTERM2          12        2.114         268          57       21.3       105.811       134.395                      0
+   QARM2           1        0.001         268         258       96.3         0.049         1.304                      0
+  QTERM3          40       22.913         385           3        0.8       798.239       804.508                      7
+   QARM3           1        0.011         377         330       87.5         0.381         3.055                      0
+    QKMM           1        0.000         601         601      100.0         0.000         0.000                      0
+    QCVK          22        6.719         302          29        9.6       298.389       330.086                      2
+
+User Chain   Entries    Average      Average     Current     Maximum
+                       Time/Xact    Contents    Contents    Contents
+    LKMM          32       1.223       0.003           0           1 
+
+
+
+Non-zero Fullword Savevalues:  (NAME : VALUE)
+
+    RET1:         116,  CNTRET1:           1,    OBRT1:         432,   TRMNT1:          15,     RET2:          72,
+   OBRT2:         268,   TRMNT2:          18,     RET3:         111,    OBRT3:         377,   TRMNT3:          34,
+  OBRCVK:         300
+
+
+
+  Random    Antithetic     Initial     Current      Sample   Chi-Square
+  Stream      Variates    Position    Position       Count   Uniformity
+       1           OFF      100000      103792        3792      0.89
+
+
+
+Status of Common Storage
+
+   25824 bytes available
+    6896 in use
+   12736 used (max)
+
+Simulation complete.  Absolute Clock: 13412.5237
+
+
+
+Total Block Executions: 28245
+
+Blocks / second:        21462766
+
+Microseconds / Block:   0.05
+
+
+
+Elapsed Time Used (Sec)
+ 
+Pass1:           0.01
+Sym/Xref         0.00
+Pass2:           0.00
+Load/Ctrl:       0.00
+Execution:       0.00
+Output:          0.00
+---------------------
+Total:           0.01
